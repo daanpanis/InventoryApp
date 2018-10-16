@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">InventoryApp</string>
+    <string name="action_scan_title">Scan</string>
+    <string name="action_home_title">Home</string>
+</resources>
