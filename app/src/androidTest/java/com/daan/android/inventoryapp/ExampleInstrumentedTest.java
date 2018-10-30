@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("android.daan.com.inventoryapp", appContext.getPackageName());
+        assertEquals("com.daan.android.inventoryapp", appContext.getPackageName());
     }
 }
