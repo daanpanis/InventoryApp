@@ -6,4 +6,7 @@
     <string name="login">Login</string>
     <string name="username">Username (Email)</string>
     <string name="register">Register</string>
+
+    <string name="err_email">You must fill in an email</string>
+    <string name="err_password">You must fill in a password (min. 5 characters)</string>
 </resources>
