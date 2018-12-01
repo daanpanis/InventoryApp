@@ -8,4 +8,5 @@
     <color name="textButtonColor">#4E92DF</color>
     <color name="loading_overlay">#62000000</color>
     <color name="error">#A31730</color>
+    <color name="lightGray">#EAEAEA</color>
 </resources>

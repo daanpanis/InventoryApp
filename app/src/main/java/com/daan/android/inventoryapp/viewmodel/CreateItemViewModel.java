@@ -12,6 +12,7 @@ public class CreateItemViewModel extends ViewModel {
 
     private MutableLiveData<String> itemName;
     private MutableLiveData<List<String>> imageUrls;
+    private MutableLiveData<Integer> sliderIndex;
 
     public CreateItemViewModel() {
     }
@@ -26,8 +27,16 @@ public class CreateItemViewModel extends ViewModel {
     public MutableLiveData<List<String>> getImageUrls() {
         if (imageUrls == null) {
             imageUrls = new MutableLiveData<>();
-            imageUrls.postValue(new ArrayList<>());
+            imageUrls.setValue(new ArrayList<>());
         }
         return imageUrls;
+    }
+
+    public MutableLiveData<Integer> getSliderIndex() {
+        if (sliderIndex == null) {
+            sliderIndex = new MutableLiveData<>();
+            sliderIndex.setValue(1);
+        }
+        return sliderIndex;
     }
 }

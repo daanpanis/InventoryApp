@@ -44,8 +44,12 @@ public class CreateItemActivity extends AppCompatActivity {
         model = ViewModelProviders.of(this).get(CreateItemViewModel.class);
 
         slider.setAdapter((adapter = new ImageSliderAdapter(R.drawable.placeholder_16_9, new ArrayList<>())));
+        slider.setSelectedSlide(Objects.requireNonNull(model.getSliderIndex().getValue()));
+        slider.setSlideChangeListener(position -> model.getSliderIndex().setValue(position));
+
         itemName.clearFocus();
 
+        itemName.setText(model.getItemName().getValue());
         model.getItemName().observe(this, s -> {
             if (getCurrentFocus() != itemName) {
                 itemName.setText(s);
@@ -89,7 +93,7 @@ public class CreateItemActivity extends AppCompatActivity {
             if (image != null) {
                 List<String> imageUrls = model.getImageUrls().getValue();
                 Objects.requireNonNull(imageUrls).add(image.getPath());
-                model.getImageUrls().postValue(imageUrls);
+                model.getImageUrls().setValue(imageUrls);
             }
         }
         super.onActivityResult(requestCode, resultCode, data);
@@ -98,7 +102,7 @@ public class CreateItemActivity extends AppCompatActivity {
     @OnTextChanged(R.id.et_item_name)
     void onNameChanged() {
         if (getCurrentFocus() == itemName) {
-            model.getItemName().postValue(itemName.getText().toString());
+            model.getItemName().setValue(itemName.getText().toString());
         }
     }
 }
