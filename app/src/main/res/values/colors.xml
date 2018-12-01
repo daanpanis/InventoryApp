@@ -5,4 +5,5 @@
     <color name="colorAccent">#F4BC1D</color>
     <color name="white">#FFF</color>
     <color name="textButtonColor">#4E92DF</color>
+    <color name="loading_overlay">#62000000</color>
 </resources>
