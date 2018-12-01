@@ -55,6 +55,14 @@
                 android:inputType="textPassword" />
         </android.support.design.widget.TextInputLayout>
 
+        <TextView
+            android:visibility="gone"
+            android:id="@+id/login_error"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:textColor="@color/error" />
+
     </LinearLayout>
 
     <LinearLayout
@@ -67,13 +75,13 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-        <ImageView
+        <ImageButton
             android:id="@+id/image_btn_google"
             android:layout_width="@dimen/login_social_size"
             android:layout_height="@dimen/login_social_size"
+            android:background="@drawable/ic_google_colored"
             android:layout_marginEnd="10dp"
-            android:layout_marginRight="10dp"
-            android:src="@drawable/ic_google_colored" />
+            android:layout_marginRight="10dp" />
 
         <ImageView
             android:id="@+id/image_btn_facebook"

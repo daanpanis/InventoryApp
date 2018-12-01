@@ -15,6 +15,7 @@ import com.yanzhenjie.zbar.camera.CameraPreview;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import io.reactivex.disposables.CompositeDisposable;
 
 public class BarcodeScannerFragment extends Fragment {

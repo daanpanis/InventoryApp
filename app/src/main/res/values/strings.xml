@@ -9,4 +9,11 @@
 
     <string name="err_email">You must fill in an email</string>
     <string name="err_password">You must fill in a password (min. 5 characters)</string>
+
+    <string name="pref_signout_title">Sign Out</string>
+    <string name="pref_signout_key">signout</string>
+    <string name="pref_signout_summary">Press this to log out of your account</string>
+
+    <string name="web_client_id">817155187170-8525eug0rdcte1bkmta7dn20hv7mctk9.apps.googleusercontent.com</string>
+    <string name="item_name">Item name</string>
 </resources>

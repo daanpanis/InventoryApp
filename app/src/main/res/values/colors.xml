@@ -3,7 +3,9 @@
     <color name="colorPrimary">#269BD8</color>
     <color name="colorPrimaryDark">#208ECE</color>
     <color name="colorAccent">#F4BC1D</color>
+    <color name="colorAccentRipple">#C18900</color>
     <color name="white">#FFF</color>
     <color name="textButtonColor">#4E92DF</color>
     <color name="loading_overlay">#62000000</color>
+    <color name="error">#A31730</color>
 </resources>

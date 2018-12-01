@@ -1,16 +1,18 @@
 package com.daan.android.inventoryapp;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.PersistableBundle;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
+import android.widget.TextView;
 
-import com.daan.android.inventoryapp.firebase.LoginService;
+import com.daan.android.inventoryapp.firebase.AuthenticationService;
 import com.daan.android.inventoryapp.utils.Loader;
+import com.daan.android.inventoryapp.utils.ValidationUtils;
 import com.mobsandgeeks.saripaar.ValidationError;
 import com.mobsandgeeks.saripaar.Validator;
 import com.mobsandgeeks.saripaar.annotation.Email;
@@ -28,6 +30,8 @@ import butterknife.OnTextChanged;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 
+import static android.view.View.GONE;
+
 public class LoginActivity extends AppCompatActivity implements Validator.ValidationListener {
 
     @Order(1)
@@ -43,36 +47,36 @@ public class LoginActivity extends AppCompatActivity implements Validator.Valida
 
     @BindView(R.id.btn_login)
     Button loginButton;
+    @BindView(R.id.login_error)
+    TextView loginError;
 
     private Validator validator;
     private boolean loginPressed = false;
     private final CompositeDisposable disposables = new CompositeDisposable();
+    private AuthenticationService authService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
+
         if (getSupportActionBar() != null) {
             getSupportActionBar().hide();
         }
 
-        setupLoginButton();
+        authService = AuthenticationService.of(this);
+
+        if (authService.isSignedIn()) {
+            startMainScreen();
+            return;
+        }
+
         validator = new Validator(this);
         validator.setValidationListener(this);
         validator.validate();
-    }
 
-
-    private void setupLoginButton() {
-       /* loginButton.setOnClickListener(v ->
-                disposables.add(LoginService.login(inputUsername.getText().toString(), inputPassword.getText().toString())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .doOnError(exception -> {
-
-                        }).subscribe(authResult -> {
-
-                        })));*/
+        setupGoogleLogin();
     }
 
     @Override
@@ -87,10 +91,17 @@ public class LoginActivity extends AppCompatActivity implements Validator.Valida
         validator.validate();
     }
 
+    @OnClick(R.id.image_btn_google)
+    public void googleLoginClick() {
+//        Loader.showSpinner(this);
+        authService.signInGoogle();
+    }
+
     @OnFocusChange({R.id.et_login_username, R.id.et_login_password})
     public void onFocusChange(View v) {
-        Log.d("TESTEST", "Focus change: " + v.getId());
-        validator.validateTill(v);
+        if (validator != null) {
+            validator.validateTill(v);
+        }
     }
 
     @OnTextChanged({R.id.et_login_username, R.id.et_login_password})
@@ -101,52 +112,69 @@ public class LoginActivity extends AppCompatActivity implements Validator.Valida
     @Override
     public void onValidationSucceeded() {
         loginButton.setEnabled(true);
-
         if (loginPressed) {
             login();
         }
-
         loginPressed = false;
     }
 
     @Override
     public void onValidationFailed(List<ValidationError> errors) {
         loginButton.setEnabled(false);
-        for (ValidationError error : errors) {
-            View view = error.getView();
-            String message = error.getCollatedErrorMessage(this);
-
-            // Display error messages ;)
-            if (view instanceof EditText) {
-                ((EditText) view).setError(message);
-            } else {
-                Toast.makeText(this, message, Toast.LENGTH_LONG).show();
-            }
-        }
+        ValidationUtils.displayErrors(this, errors);
         loginPressed = false;
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        Log.d("TESTEST", "Restore instance state 2");
         validator.validate();
     }
 
     @Override
     public void onRestoreInstanceState(Bundle savedInstanceState, PersistableBundle persistentState) {
         super.onRestoreInstanceState(savedInstanceState, persistentState);
-        Log.d("TESTEST", "Restore instance state 1");
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        authService.handleGoogleSignIn(requestCode, resultCode, data);
     }
 
     private void login() {
+        loginError.setVisibility(GONE);
         Loader.showSpinner(this);
-        disposables.add(LoginService.login(usernameField.getText().toString(), passwordField.getText().toString())
+        disposables.add(authService.login(usernameField.getText().toString(), passwordField.getText().toString())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnError(exception -> {
+                .subscribe(authResult -> {
                     Loader.removeSpinner(this);
-                }).subscribe(authResult -> {
+                    startMainScreen();
+                }, exception -> {
                     Loader.removeSpinner(this);
+                    showError(exception.getMessage());
                 }));
+    }
+
+    private void setupGoogleLogin() {
+        disposables.add(authService.getGoogleSignInObservable().observeOn(AndroidSchedulers.mainThread())
+                .subscribe(result -> {
+                    Loader.removeSpinner(this);
+                    startMainScreen();
+                }, exception -> {
+                    Loader.removeSpinner(this);
+                    showError(exception.getMessage());
+                }));
+    }
+
+    private void showError(String message) {
+        loginError.setText(message);
+        loginError.setVisibility(View.VISIBLE);
+    }
+
+    private void startMainScreen() {
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
     }
 }

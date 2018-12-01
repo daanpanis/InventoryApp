@@ -1,22 +1,18 @@
 package com.daan.android.inventoryapp;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 
-import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class HomeFragment extends Fragment {
-
-    @BindView(R.id.textView)
-    Button button;
 
     @Nullable
     @Override
@@ -28,10 +24,10 @@ public class HomeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
+    }
 
-        button.setOnTouchListener((v, e) -> {
-            Log.d("HomeFragment", e.getAction() + "");
-            return false;
-        });
+    @OnClick(R.id.btn_create_item)
+    void createItem() {
+        startActivity(new Intent(getActivity(), CreateItemActivity.class));
     }
 }
