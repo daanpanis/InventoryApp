@@ -9,52 +9,60 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.Result;
 import com.tbruyelle.rxpermissions2.RxPermissions;
-import com.yanzhenjie.zbar.camera.CameraPreview;
 
-import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import io.reactivex.disposables.CompositeDisposable;
+import java8.util.function.BiConsumer;
+import java8.util.function.Consumer;
+import me.dm7.barcodescanner.zxing.ZXingScannerView;
 
-public class BarcodeScannerFragment extends Fragment {
+public class BarcodeScannerFragment extends Fragment implements ZXingScannerView.ResultHandler {
 
-    @BindView(R.id.capture_preview)
-    CameraPreview cameraPreview;
-
-    private RxPermissions rxPermissions;
+    private ZXingScannerView scannerView;
     private final CompositeDisposable disposables = new CompositeDisposable();
+    private BiConsumer<String, BarcodeFormat> scannerListener;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_barcode_scanner, container, false);
+        scannerView = new ZXingScannerView(getContext());
+        return scannerView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        scannerView.setResultHandler(this);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        scannerView.stopCamera();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
-        Log.d("BarcodeScannerFragment", "onViewCreated");
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        Log.d("BarcodeScannerFragment", "onStart");
-        rxPermissions = new RxPermissions(this);
+        RxPermissions rxPermissions = new RxPermissions(this);
         disposables.add(rxPermissions
                 .request(Manifest.permission.CAMERA)
                 .subscribe(granted -> {
                     if (granted) {
-                        if (cameraPreview.start()) {
-                            cameraPreview.setScanCallback(content -> {
-                                Log.d("BarcodeScannerFragment", "Content: " + content);
-                            });
-                        }
+                        scannerView.startCamera();
                     } else {
-                        // Oups permission denied
+                        Toast.makeText(getContext(), R.string.need_camera_permissions, Toast.LENGTH_SHORT).show();
                     }
                 }));
     }
@@ -63,6 +71,16 @@ public class BarcodeScannerFragment extends Fragment {
     public void onStop() {
         super.onStop();
         disposables.dispose();
-        cameraPreview.stop();
+    }
+
+    public void setScannerListener(BiConsumer<String, BarcodeFormat> scannerListener) {
+        this.scannerListener = scannerListener;
+    }
+
+    @Override
+    public void handleResult(Result result) {
+        if (this.scannerListener != null) {
+            this.scannerListener.accept(result.getText(), result.getBarcodeFormat());
+        }
     }
 }

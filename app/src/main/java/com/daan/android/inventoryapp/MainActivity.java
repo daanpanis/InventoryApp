@@ -8,9 +8,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.daan.android.inventoryapp.firebase.ItemStoreService;
 import com.daan.android.inventoryapp.settings.SettingsActivity;
 
 import butterknife.ButterKnife;
+
+import static com.daan.android.inventoryapp.utils.Constants.ACTION_SEARCH;
+import static com.daan.android.inventoryapp.utils.Constants.BARCODE_EXTRA;
+import static com.daan.android.inventoryapp.utils.Constants.BARCODE_FORMAT_EXTRA;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -21,7 +26,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-
 
         showHome();
 
@@ -53,11 +57,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showBarCodeScanner() {
-        showFragment(new BarcodeScannerFragment());
+        BarcodeScannerFragment barcodeScanner = new BarcodeScannerFragment();
+        barcodeScanner.setScannerListener((content, format) -> {
+            Intent intent = new Intent(ACTION_SEARCH);
+            intent.putExtra(BARCODE_EXTRA, content);
+            intent.putExtra(BARCODE_FORMAT_EXTRA, format);
+            startActivity(intent);
+        });
+        showFragment(barcodeScanner);
     }
 
     private void showHome() {
-        showFragment(new HomeFragment());
+        ItemListFragment fragment = new ItemListFragment();
+        fragment.setItemsObservable(ItemStoreService.getInstance().getUserItems());
+        showFragment(fragment);
     }
 
     private void showFragment(Fragment fragment) {

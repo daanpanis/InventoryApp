@@ -16,4 +16,12 @@
 
     <string name="web_client_id">817155187170-8525eug0rdcte1bkmta7dn20hv7mctk9.apps.googleusercontent.com</string>
     <string name="item_name">Item name</string>
+    <string name="barcode_label">Barcode / QR-Code</string>
+    <string name="saving">Saving...</string>
+    <string name="saved_item">Saved item!</string>
+    <string name="saving_item">Saving item...</string>
+
+    <string name="need_camera_permissions">You need to give camera permissions.</string>
+    <string name="no_search_results">No search results...</string>
+    <string name="search_results_title">Search results</string>
 </resources>

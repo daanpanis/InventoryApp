@@ -20,6 +20,7 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import java.util.Objects;
 
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import io.reactivex.subjects.PublishSubject;
 
 public class AuthenticationService {
@@ -28,6 +29,14 @@ public class AuthenticationService {
 
     public static AuthenticationService of(Activity activity) {
         return new AuthenticationService(activity);
+    }
+
+    public static boolean isSignedIn() {
+        return FirebaseAuth.getInstance().getCurrentUser() != null;
+    }
+
+    public static FirebaseUser getUser() {
+        return FirebaseAuth.getInstance().getCurrentUser();
     }
 
     private final Activity activity;
@@ -43,19 +52,18 @@ public class AuthenticationService {
         signInClient = GoogleSignIn.getClient(this.activity, gso);
     }
 
-    public boolean isSignedIn() {
-        return FirebaseAuth.getInstance().getCurrentUser() != null;
-    }
-
-    public FirebaseUser getUser() {
-        return FirebaseAuth.getInstance().getCurrentUser();
-    }
-
-    public Observable<AuthResult> login(String username, String password) {
-        PublishSubject<AuthResult> authResult = PublishSubject.create();
-        FirebaseAuth.getInstance().signInWithEmailAndPassword(username, password)
-                .addOnCompleteListener(task -> handleAuthResult(authResult, task));
-        return authResult;
+    public Single<AuthResult> login(String username, String password) {
+        return Single.create(emitter -> FirebaseAuth.getInstance()
+                .signInWithEmailAndPassword(username, password)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult() != null) {
+                        emitter.onSuccess(task.getResult());
+                    } else if (task.getException() != null) {
+                        emitter.onError(task.getException());
+                    } else {
+                        emitter.onError(new Exception("An unknown error occurred while logging in."));
+                    }
+                }));
     }
 
     public void signInGoogle() {
@@ -71,14 +79,20 @@ public class AuthenticationService {
                 GoogleSignInAccount account = signInTask.getResult(ApiException.class);
                 AuthCredential credential = GoogleAuthProvider.getCredential(Objects.requireNonNull(account).getIdToken(), null);
                 FirebaseAuth.getInstance().signInWithCredential(credential)
-                        .addOnCompleteListener(activity, task -> handleAuthResult(googleSignInResult, task));
+                        .addOnCompleteListener(activity, task -> {
+                            if (task.isSuccessful() && task.getResult() != null) {
+                                googleSignInResult.onNext(task.getResult());
+                            } else if (task.getException() != null) {
+                                googleSignInResult.onError(task.getException());
+                            } else {
+                                googleSignInResult.onError(new Exception("An unknown error occurred while logging in."));
+                            }
+                        });
             } catch (Exception e) {
                 e.printStackTrace();
                 googleSignInResult.onError(e);
             }
-        } /*else if (requestCode == RC_SIGN_IN) {
-            googleSignInResult.onError(new Exception("An unknown error occurred while trying to log in."));
-        }*/
+        }
     }
 
     public Observable<AuthResult> getGoogleSignInObservable() {
@@ -91,15 +105,5 @@ public class AuthenticationService {
             return;
         }
         auth.signOut();
-    }
-
-    private void handleAuthResult(PublishSubject<AuthResult> resultObservable, Task<AuthResult> task) {
-        if (task.isSuccessful() && task.getResult() != null) {
-            resultObservable.onNext(task.getResult());
-        } else if (task.getException() != null) {
-            resultObservable.onError(task.getException());
-        } else {
-            resultObservable.onError(new Exception("An unknown error occurred while logging in."));
-        }
     }
 }

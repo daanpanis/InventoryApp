@@ -59,25 +59,47 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
+            android:orientation="vertical"
             android:paddingLeft="16dp"
             android:paddingRight="16dp">
 
-            <RelativeLayout
+
+            <com.rengwuxian.materialedittext.MaterialEditText
+                android:id="@+id/et_item_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/edit_text_background">
+                android:inputType="text"
+                app:met_floatingLabel="highlight"
+                app:met_floatingLabelAlwaysShown="true"
+                app:met_floatingLabelText="@string/item_name"
+                app:met_primaryColor="@color/colorPrimary" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal">
+
+                <ImageButton
+                    android:id="@+id/btn_scan_barcode"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center_vertical"
+                    android:src="@drawable/ic_barcode_scanner" />
 
                 <com.rengwuxian.materialedittext.MaterialEditText
-                    android:id="@+id/et_item_name"
-                    android:layout_width="match_parent"
+                    android:id="@+id/et_item_barcode"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:background="@color/lightGray"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
                     android:inputType="text"
-                    app:met_floatingLabel="normal"
+                    app:met_floatingLabel="highlight"
                     app:met_floatingLabelAlwaysShown="true"
-                    app:met_floatingLabelText="@string/item_name"
-                    app:met_primaryColor="@color/colorAccent" />
-            </RelativeLayout>
+                    app:met_floatingLabelText="@string/barcode_label"
+                    app:met_primaryColor="@color/colorPrimary" />
+
+            </LinearLayout>
 
             <!--  <android.support.design.widget.TextInputLayout
                   android:layout_width="match_parent"

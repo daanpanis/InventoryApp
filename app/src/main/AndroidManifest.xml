@@ -13,6 +13,19 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <service
+            android:name=".services.SaveItemService"
+            android:exported="false" />
+
+        <!--
+        <receiver
+            android:name=".receivers.SavingBroadcastReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.daan.android.inventoryapp.ACTION_SAVING" />
+            </intent-filter>
+        </receiver>
+        -->
         <activity android:name=".MainActivity" />
         <activity android:name=".LoginActivity">
             <intent-filter>
@@ -22,7 +35,14 @@
             </intent-filter>
         </activity>
         <activity android:name=".settings.SettingsActivity" />
-        <activity android:name=".CreateItemActivity"></activity>
+        <activity android:name=".CreateItemActivity" />
+        <activity android:name=".BarcodeScannerActivity" />
+        <activity android:name=".SearchActivity">
+            <intent-filter>
+                <action android:name="com.daan.android.inventoryapp.ACTION_SEARCH"></action>
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>
