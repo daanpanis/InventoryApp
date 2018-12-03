@@ -7,6 +7,7 @@ public class Constants {
     public static final String BARCODE_FORMAT_EXTRA = "barcode_extra";
     public static final String ITEM_EXTRA = "item";
     public static final String SAVING_EXTRA = "saving";
+    public static final String ITEM_ID_EXTRA = "item_id";
 
     // Process codes
     public static int PC_BARCODE_SCANNER = 9865;
@@ -23,6 +24,7 @@ public class Constants {
     // Intent filters
     public static final String ACTION_SAVING = "com.daan.android.inventoryapp.ACTION_SAVING";
     public static final String ACTION_SEARCH = "com.daan.android.inventoryapp.ACTION_SEARCH";
+    public static final String ACTION_VIEW_ITEM = "com.daan.android.inventoryapp.ACTION_VIEW_ITEM";
 
     private Constants() {
     }

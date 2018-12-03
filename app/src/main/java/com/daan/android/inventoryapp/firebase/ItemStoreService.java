@@ -8,6 +8,7 @@ import com.daan.android.inventoryapp.viewmodel.CreateItemViewModel;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
@@ -81,6 +82,7 @@ public class ItemStoreService {
                 item.setName(model.getItemName().getValue());
                 item.setBarcode(model.getItemBarcode().getValue());
                 item.setBarcodeFormat(model.getItemBarcodeFormat().getValue());
+                item.setDescription(model.getItemDescription().getValue());
 
                 database.collection(DB_ITEMS_COLLECTION)
                         .add(item)
@@ -122,6 +124,23 @@ public class ItemStoreService {
                     .addSnapshotListener((snapshots, e) -> {
                         if (snapshots != null) {
                             emitter.onNext(snapshots.getDocumentChanges());
+                        } else {
+                            emitter.onError(e);
+                        }
+                    });
+        });
+    }
+
+    public Observable<DocumentSnapshot> getItemById(String itemId) {
+        return Observable.create(emitter -> {
+            if (!AuthenticationService.isSignedIn()) {
+                emitter.onError(new Exception("You must be authenticatde to do this"));
+                return;
+            }
+            database.collection(DB_ITEMS_COLLECTION).document(itemId)
+                    .addSnapshotListener((snapshot, e) -> {
+                        if (snapshot != null) {
+                            emitter.onNext(snapshot);
                         } else {
                             emitter.onError(e);
                         }

@@ -11,7 +11,9 @@ import android.widget.TextView;
 
 import com.daan.android.inventoryapp.R;
 import com.daan.android.inventoryapp.models.Item;
+import com.daan.android.inventoryapp.utils.ImageUtils;
 import com.google.zxing.BarcodeFormat;
+import com.google.zxing.Dimension;
 import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.common.BitMatrix;
 import com.journeyapps.barcodescanner.BarcodeEncoder;
@@ -25,6 +27,8 @@ import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import java8.util.function.BiConsumer;
+
+import static com.daan.android.inventoryapp.utils.ImageUtils.getBarcodeFormat;
 
 public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder> {
 
@@ -96,29 +100,14 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder
             if (holder.item.getImageUrls().size() > 0) {
                 Picasso.get().load(Uri.parse(holder.item.getImageUrls().get(0))).placeholder(R.drawable.placeholder_16_9).into(itemPicture);
             }
-            BarcodeFormat format = getFormat(holder.item.getBarcodeFormat());
+            BarcodeFormat format = getBarcodeFormat(holder.item.getBarcodeFormat());
             if (holder.item.getBarcode() != null && format != null) {
-                disposables.add(Observable.fromCallable(() -> {
-                    MultiFormatWriter multiFormatWriter = new MultiFormatWriter();
-                    BitMatrix bitMatrix = multiFormatWriter.encode(holder.item.getBarcode(), BarcodeFormat.CODABAR, 1000, 200);
-                    BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
-                    return barcodeEncoder.createBitmap(bitMatrix);
-                }).observeOn(AndroidSchedulers.mainThread())
+                disposables.add(ImageUtils.generateBarcode(holder.item.getBarcode(), format, new Dimension(1000, 200))
+                        .observeOn(AndroidSchedulers.mainThread())
                         .doFinally(disposables::dispose)
                         .subscribe(itemBarcode::setImageBitmap));
             }
         }
 
-        private BarcodeFormat getFormat(String format) {
-            if (format == null) {
-                return null;
-            }
-            for (BarcodeFormat barcodeFormat : BarcodeFormat.values()) {
-                if (barcodeFormat.name().equals(format)) {
-                    return barcodeFormat;
-                }
-            }
-            return null;
-        }
     }
 }

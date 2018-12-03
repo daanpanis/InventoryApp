@@ -20,6 +20,7 @@ public class CreateItemViewModel extends ViewModel implements Parcelable {
     private MutableLiveData<Integer> sliderIndex;
     private MutableLiveData<String> itemBarcode;
     private MutableLiveData<String> itemBarcodeFormat;
+    private MutableLiveData<String> itemDescription;
 
     public CreateItemViewModel() {
     }
@@ -33,6 +34,7 @@ public class CreateItemViewModel extends ViewModel implements Parcelable {
             (this.sliderIndex = new MutableLiveData<>()).setValue(in.readInt());
             (this.itemBarcode = new MutableLiveData<>()).setValue(in.readString());
             (this.itemBarcodeFormat = new MutableLiveData<>()).setValue(in.readString());
+            (this.itemDescription = new MutableLiveData<>()).setValue(in.readString());
         }).subscribeOn(AndroidSchedulers.mainThread()).blockingAwait();
     }
 
@@ -85,6 +87,13 @@ public class CreateItemViewModel extends ViewModel implements Parcelable {
         return itemBarcodeFormat;
     }
 
+    public MutableLiveData<String> getItemDescription() {
+        if (itemDescription == null) {
+            itemDescription = new MutableLiveData<>();
+        }
+        return itemDescription;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -97,5 +106,6 @@ public class CreateItemViewModel extends ViewModel implements Parcelable {
         dest.writeInt(getSliderIndex().getValue());
         dest.writeString(getItemBarcode().getValue());
         dest.writeString(getItemBarcodeFormat().getValue());
+        dest.writeString(getItemDescription().getValue());
     }
 }

@@ -6,11 +6,6 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <fragment
-        android:id="@+id/saving_fragment"
-        android:name="com.daan.android.inventoryapp.components.SavingFragment"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
 
     <FrameLayout
         android:id="@+id/fragment_holder"
@@ -19,7 +14,7 @@
         app:layout_constraintBottom_toTopOf="@+id/frag_bottom_navbar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/saving_fragment" />
 
     <fragment
         android:id="@+id/frag_bottom_navbar"
@@ -27,5 +22,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent" />
+
+    <fragment
+        android:id="@+id/saving_fragment"
+        android:name="com.daan.android.inventoryapp.components.SavingFragment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
 </android.support.constraint.ConstraintLayout>

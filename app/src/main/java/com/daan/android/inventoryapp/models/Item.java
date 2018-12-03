@@ -12,6 +12,7 @@ public class Item {
     private String barcode;
     private String barcodeFormat;
     private List<String> imageUrls = new ArrayList<>();
+    private String description;
 
     public Item(String ownerId) {
         this.ownerId = ownerId;
@@ -59,5 +60,13 @@ public class Item {
 
     public void setBarcodeFormat(String barcodeFormat) {
         this.barcodeFormat = barcodeFormat;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getDescription() {
+        return description;
     }
 }

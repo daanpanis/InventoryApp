@@ -27,6 +27,8 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import java8.util.stream.IntStreams;
 
+import static com.daan.android.inventoryapp.utils.Constants.ACTION_VIEW_ITEM;
+import static com.daan.android.inventoryapp.utils.Constants.ITEM_ID_EXTRA;
 import static java8.util.stream.StreamSupport.stream;
 
 public class ItemListFragment extends Fragment {
@@ -57,6 +59,12 @@ public class ItemListFragment extends Fragment {
         if (itemObservable != null && disposable == null) {
             subscribe();
         }
+
+        adapter.setOnClickListener((id, item) -> {
+            Intent intent = new Intent(ACTION_VIEW_ITEM);
+            intent.putExtra(ITEM_ID_EXTRA, id);
+            startActivity(intent);
+        });
     }
 
     public void setItemsObservable(Observable<Collection<DocumentChange>> itemsObservable) {

@@ -1,5 +1,6 @@
 package com.daan.android.inventoryapp;
 
+import android.Manifest;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
@@ -14,6 +15,7 @@ import com.daan.android.inventoryapp.viewmodel.CreateItemViewModel;
 import com.esafirm.imagepicker.features.ImagePicker;
 import com.esafirm.imagepicker.features.ReturnMode;
 import com.esafirm.imagepicker.model.Image;
+import com.tbruyelle.rxpermissions2.RxPermissions;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -47,6 +49,8 @@ public class CreateItemActivity extends AppCompatActivity {
     EditText itemName;
     @BindView(R.id.et_item_barcode)
     EditText itemBarcode;
+    @BindView(R.id.et_item_description)
+    EditText itemDescription;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,14 +65,11 @@ public class CreateItemActivity extends AppCompatActivity {
 
         itemName.clearFocus();
         itemBarcode.clearFocus();
+        itemDescription.clearFocus();
 
         itemName.setText(model.getItemName().getValue());
         itemBarcode.setText(model.getItemBarcode().getValue());
-        model.getItemName().observe(this, s -> {
-            if (getCurrentFocus() != itemName) {
-                itemName.setText(s);
-            }
-        });
+        itemDescription.setText(model.getItemDescription().getValue());
         model.getImageUrls().observe(this, paths -> {
             if (paths != null) {
                 adapter.setImageUrls(StreamSupport.stream(paths).map(path -> new File(path).toURI().toString())
@@ -87,10 +88,6 @@ public class CreateItemActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.menu_action_save) {
-         /*   disposables.add(ItemStoreService.getInstance()
-                    .addItem(model)
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(i -> finish()));*/
             Intent serviceIntent = new Intent(this, SaveItemService.class);
             serviceIntent.putExtra(ITEM_EXTRA, model);
             startService(serviceIntent);
@@ -102,14 +99,20 @@ public class CreateItemActivity extends AppCompatActivity {
 
     @OnClick(R.id.add_item_picture)
     void addImage() {
-        ImagePicker
-                .create(this)
-                .returnMode(ReturnMode.ALL)
-                .folderMode(false)
-                .includeVideo(false)
-                .single()
-                .imageFullDirectory(getTempFolder().getPath())
-                .start();
+        disposables.add(new RxPermissions(this)
+                .request(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                .subscribe(granted -> {
+                    if (granted) {
+                        ImagePicker
+                                .create(this)
+                                .returnMode(ReturnMode.ALL)
+                                .folderMode(false)
+                                .includeVideo(false)
+                                .single()
+//                                .imageFullDirectory(getTempFolder().getPath())
+                                .start();
+                    }
+                }));
     }
 
     @OnClick(R.id.btn_scan_barcode)
@@ -148,12 +151,14 @@ public class CreateItemActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    @OnTextChanged({R.id.et_item_name, R.id.et_item_barcode})
+    @OnTextChanged({R.id.et_item_name, R.id.et_item_barcode, R.id.et_item_description})
     void onTextChanged() {
         if (getCurrentFocus() == itemName) {
             model.getItemName().setValue(itemName.getText().toString());
         } else if (getCurrentFocus() == itemBarcode) {
             model.getItemBarcode().setValue(itemBarcode.getText().toString());
+        } else if (getCurrentFocus() == itemDescription) {
+            model.getItemDescription().setValue(itemDescription.getText().toString());
         }
     }
 }
